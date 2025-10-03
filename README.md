@@ -7,8 +7,14 @@ up to 10 BTC, or up to a provided `qty` parameter.
 
 ## Quick Setup
 
-1. git clone ...
-2. pip install -r requirements.txt
+Requires Python (tested with 3.13) and pip.
+
+```
+git clone https://github.com/dr-boris/orderbook-aggregator.git
+python3 -m venv .env
+. .env/bin/activate
+pip install -r requirements.txt
+```
 
 ## Run
 
@@ -17,7 +23,7 @@ python ob_aggregator.py
 ```
 or
 ```commandline
-python ob_aggregator.py --qty 20
+python ob_aggregator.py --qty 100
 ```
 
 ### Notes
@@ -31,6 +37,12 @@ Using a Redis cache, a dedicated rates-server or a global memory-map might be a 
 solution to align between executions, and depending on use-case.
 
 The configuration (timeouts, limits, ...) can be modified in `common/defaults.py`.
+
+### Observations
+
+Sometimes, for low volumes, the sell price is higher than buy! This is probably
+due to discrepancy between different exchanges.
+This indicates **arbitrage opportunities**.
 
 ## Probe
 

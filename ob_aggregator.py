@@ -23,7 +23,7 @@ async def get_coinbase_data() -> (list[list], list[list]):
                 data = await response.json()
                 if response.status != 200:
                     raise Exception(f'Got responsestatus {response.status}')
-                log.info('Coinbase data received!')
+                log.info('Coinbase data received')
                 auction_mode = data.get('auction_mode')
                 if auction_mode:
                     log.warning(data)
@@ -48,7 +48,7 @@ async def get_gemini_data():
                 data = await response.json()
                 if response.status != 200:
                     raise Exception(f'Got responsestatus {response.status}')
-                log.info('Gemini data received!')
+                log.info('Gemini data received')
                 # list of dict with {price, amount, timestamp} as keys
                 bids = data.get('bids')
                 asks = data.get('asks')
@@ -123,7 +123,7 @@ async def main(qty: Decimal = Decimal(QTY_DEFAULT)):
         # Calculate prices
         bid_price = calculate_price_inorder(bids, qty)
         ask_price = calculate_price_inorder(asks, qty)
-        log.info('Calculation finished!')
+        log.info('Calculation finished')
     except asyncio.TimeoutError:
         log.error(f'Request timeout after {TIMEOUT_SECONDS} seconds')
         return 1

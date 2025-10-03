@@ -7,7 +7,7 @@ up to 10 BTC, or up to a provided `qty` parameter.
 
 ## Quick Setup
 
-Requires Python (tested with 3.13) and pip.
+Requires Python and pip. Tested with with 3.11 and 3.13.
 
 ```
 git clone https://github.com/dr-boris/orderbook-aggregator.git

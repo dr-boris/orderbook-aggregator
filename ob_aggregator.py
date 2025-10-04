@@ -1,7 +1,7 @@
 import argparse
 import aiohttp
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal, getcontext
 import functools
 from pathlib import Path
@@ -137,10 +137,14 @@ async def main(qty: Decimal = Decimal(QTY_DEFAULT)):
 
 def get_decimal_or_exit(qty):
     try:
-        return Decimal(qty)
+        qty = Decimal(qty)
+        if qty < DECIMAL_ZERO:
+            print(f'Provided --qty ({qty}) is negative!')
+            exit(1)
+        return qty
     except Exception:
         print(f'Provided --qty ({qty}) is not a number!')
-        return 1
+        exit(1)
 
 
 if __name__ == '__main__':

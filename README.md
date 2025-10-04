@@ -7,10 +7,11 @@ up to 10 BTC, or up to a provided `qty` parameter.
 
 ## Quick Setup
 
-Requires Python and pip. Tested with with 3.11 and 3.13.
+Requires Python and pip. Tested with `3.11` and `3.13`.
 
 ```
 git clone https://github.com/dr-boris/orderbook-aggregator.git
+cd orderbook-aggregator
 python3 -m venv .env
 . .env/bin/activate
 pip install -r requirements.txt
@@ -43,6 +44,15 @@ The configuration (timeouts, limits, ...) can be modified in `common/defaults.py
 Sometimes, for low volumes, the sell price is higher than buy! This is probably
 due to discrepancy between different exchanges.
 This indicates **arbitrage opportunities**.
+
+## Test
+
+There is a quick unit test available for the aggregator algorithm.
+You can run it from root directory via
+
+```commandline
+python test.py
+```
 
 ## Probe
 

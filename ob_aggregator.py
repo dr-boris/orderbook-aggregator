@@ -69,12 +69,17 @@ def validate(bids: list, asks: list, specifier: str):
 
 
 def calculate_price_inorder(data: list[list], qty: Decimal) -> Decimal:
-    """Traverses the data in-order and calculates the total price"""
+    """Traverses the data in-order and calculates the total price
+
+    There are multiple assumptions necessary:
+      - data needs to contain a list of [price, quantity] pairs.
+      - qty can not be negative!
+    """
     to_cover = qty  # How much quantity is left 'to cover'
     acc_price = Decimal(0)  # Current aggregated price
     pos = 0
     size = len(data)
-    while to_cover > DECIMAL_ZERO and pos < size:
+    while pos < size:
         price = data[pos][0]
         q = data[pos][1]
         if q < to_cover:

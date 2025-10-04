@@ -9,6 +9,7 @@ from pathlib import Path
 from common.defaults import *
 
 
+# Script specific settings
 log = logging.getLogger('aggregator')
 getcontext().prec = 30
 DECIMAL_ZERO = Decimal(0)
@@ -31,8 +32,8 @@ async def get_coinbase_data() -> (list[list], list[list]):
                 # list of lists with [price, qty, num_orders]
                 bids = data.get('bids')
                 asks = data.get('asks')
-                bids = [[Decimal(x),Decimal(y)] for x,y,z in bids]
-                asks = [[Decimal(x),Decimal(y)] for x,y,z in asks]
+                bids = [ [Decimal(x),Decimal(y)] for x,y,z in bids ]
+                asks = [ [Decimal(x),Decimal(y)] for x,y,z in asks ]
                 validate(bids, asks, 'Coinbase')
                 return bids, asks
             except Exception as e:
@@ -52,8 +53,8 @@ async def get_gemini_data():
                 # list of dict with {price, amount, timestamp} as keys
                 bids = data.get('bids')
                 asks = data.get('asks')
-                bids = [[Decimal(bid['price']), Decimal(bid['amount'])] for bid in bids]
-                asks = [[Decimal(ask['price']), Decimal(ask['amount'])] for ask in asks]
+                bids = [ [Decimal(bid['price']), Decimal(bid['amount'])] for bid in bids ]
+                asks = [ [Decimal(ask['price']), Decimal(ask['amount'])] for ask in asks ]
                 validate(bids, asks, 'Gemini')
                 return bids, asks
             except Exception as e:
@@ -73,7 +74,7 @@ def calculate_price_inorder(data: list[list], qty: Decimal) -> Decimal:
 
     There are multiple assumptions necessary:
       - data needs to contain a list of [price, quantity] pairs.
-      - qty can not be negative!
+      - qty needs to be positive!
     """
     to_cover = qty  # How much quantity is left 'to cover'
     acc_price = Decimal(0)  # Current aggregated price
@@ -93,6 +94,10 @@ def calculate_price_inorder(data: list[list], qty: Decimal) -> Decimal:
 
 
 def RateLimit(func):
+    """The Rate Limit decorator wraps the execution around a time-check.
+
+    A file is used to track elapsed time between subsequent successful executions.
+    """
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
         rates_file = Path(RATES_FILE)

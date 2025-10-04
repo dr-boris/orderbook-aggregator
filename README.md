@@ -17,6 +17,9 @@ python3 -m venv .env
 pip install -r requirements.txt
 ```
 
+The configuration (timeouts, limits, ...) can be modified in `common/defaults.py`.
+The default values are already optimal.
+
 ## Run
 
 ```commandline
@@ -36,8 +39,6 @@ until you can run the script again.
 
 Using a Redis cache, a dedicated rates-server or a global memory-map might be a better
 solution to align between executions, and depending on use-case.
-
-The configuration (timeouts, limits, ...) can be modified in `common/defaults.py`.
 
 ### Observations
 

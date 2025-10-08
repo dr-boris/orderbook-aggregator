@@ -177,10 +177,10 @@ async def main(qty: Decimal = Decimal(QTY_DEFAULT)):
         return 1
     # print(f'To buy {qty} BTC: ${ask_price:,.2f}')
     print(f'To buy {qty} ETH: ${ask_price:,.2f}')
-    print(f'Buy coverage by provider: Coinbase {ask_cb_percent}  Gemini {100-ask_cb_percent}')
+    print(f'Buy coverage by provider: Coinbase {ask_cb_percent:.2f}% Gemini {(100-ask_cb_percent):.2f}%')
     # print(f'To sell {qty} BTC: ${bid_price:,.2f}')
     print(f'To sell {qty} ETH: ${bid_price:,.2f}')
-    print(f'Sell coverage by provider: Coinbase {bid_cb_percent}  Gemini {100-bid_cb_percent}')
+    print(f'Sell coverage by provider: Coinbase {bid_cb_percent:.2f}%  Gemini {(100-bid_cb_percent):.2f}%')
     return 0
 
 

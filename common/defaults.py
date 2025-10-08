@@ -6,8 +6,10 @@ logging.config.fileConfig(
     defaults={'logfilename': 'log/last_run.log'}
 )
 
-GEMINI_URL = 'https://api.gemini.com/v1/book/BTCUSD'
-COINBASE_URL = 'https://api.exchange.coinbase.com/products/BTC-USD/book?level=2'
+# GEMINI_URL = 'https://api.gemini.com/v1/book/BTCUSD'
+GEMINI_URL = 'https://api.gemini.com/v1/book/ETHUSD'
+# COINBASE_URL = 'https://api.exchange.coinbase.com/products/BTC-USD/book?level=2'
+COINBASE_URL = 'https://api.exchange.coinbase.com/products/ETH-USD/book?level=2'
 QTY_DEFAULT = 10
 TIMEOUT_SECONDS = 5
 RATE_LIMIT_SECONDS = 2

@@ -69,7 +69,7 @@ def validate(bids: list, asks: list, specifier: str):
         raise Exception(f'No asks received from {specifier}!')
 
 
-def calculate_price_inorder(data: list[list], qty: Decimal) -> Decimal:
+def calculate_price_inorder(data: list[list], qty: Decimal) -> (Decimal, str):
     """Traverses the data in-order and calculates the total price
 
     There are multiple assumptions necessary:
@@ -77,19 +77,35 @@ def calculate_price_inorder(data: list[list], qty: Decimal) -> Decimal:
       - qty needs to be positive!
     """
     to_cover = qty  # How much quantity is left 'to cover'
+    #                Coinbase   Gmini
+    provider_qty = [Decimal(0), Decimal(0)]
+    percent = 0
     acc_price = Decimal(0)  # Current aggregated price
     pos = 0
     size = len(data)
     while pos < size:
         price = data[pos][0]
+        provider = data[pos][2]
         q = data[pos][1]
         if q < to_cover:
             acc_price += price * q
             to_cover -= q
+            if provider == 'coinbase':
+                provider_qty[0] += q
+            else:
+                provider_qty[1] += q
             pos += 1
         else:
             acc_price += price * to_cover
-            return acc_price
+            if provider == 'coinbase':
+                provider_qty[0] += to_cover
+            else:
+                provider_qty[1] += to_cover
+            if provider_qty[1] == DECIMAL_ZERO:
+                percent = 100
+            else:
+                percent = (provider_qty[0] / (provider_qty[0] + provider_qty[1])) * 100
+            return acc_price, percent
     raise Exception(f'Desired quantity of {qty} BTC can not be achieved!')
 
 
@@ -119,20 +135,39 @@ def RateLimit(func):
 
 @RateLimit
 async def main(qty: Decimal = Decimal(QTY_DEFAULT)):
-    log.info(f'Starting Order Book Aggregator for {qty} BTC')
+    # log.info(f'Starting Order Book Aggregator for {qty} BTC')
+    log.info(f'Starting Order Book Aggregator for {qty} ETH')
     bid_price = None
     ask_price = None
     try:
         data_coinbase, data_gemini = await asyncio.gather(get_coinbase_data(), get_gemini_data())
+
+        # data_coinbase[0] : [[price, qty, exchange]]
+
+        bids_coinbase = data_coinbase[0]
+        annotaed_bids_coinbase = [ [bid[0], bid[1], 'coinbase'] for bid in bids_coinbase ]
+        asks_coinbase = data_coinbase[1]
+        annotaed_asks_coinbase = [[ask[0], ask[1], 'coinbase'] for ask in asks_coinbase]
+
+        bids_gemini = data_gemini[0]
+        annotaed_bids_gemini = [ [bid[0], bid[1], 'gemini'] for bid in bids_gemini ]
+        asks_gemini = data_gemini[1]
+        annotaed_asks_gemini = [[ask[0], ask[1], 'gemini'] for ask in asks_gemini]
+
         # Merge data from exchanges
-        bids = data_coinbase[0] + data_gemini[0]
-        asks = data_coinbase[1] + data_gemini[1]
+        bids = annotaed_bids_coinbase + annotaed_bids_gemini
+        asks = annotaed_asks_coinbase + annotaed_asks_gemini
+
         # Sort all data
         bids.sort(key=lambda x: x[0], reverse=True)
         asks.sort(key=lambda x: x[0])
+
+        print(f'merged bids: {bids}')
+        print(f'merged asks: {asks}')
+
         # Calculate prices
-        bid_price = calculate_price_inorder(bids, qty)
-        ask_price = calculate_price_inorder(asks, qty)
+        bid_price, bid_cb_percent = calculate_price_inorder(bids, qty)
+        ask_price, ask_cb_percent = calculate_price_inorder(asks, qty)
         log.info('Calculation finished')
     except asyncio.TimeoutError:
         log.error(f'Request timeout after {TIMEOUT_SECONDS} seconds')
@@ -140,8 +175,12 @@ async def main(qty: Decimal = Decimal(QTY_DEFAULT)):
     except Exception as e:
         log.error(f'Data Aggregation failed: {e}')
         return 1
-    print(f'To buy {qty} BTC: ${ask_price:,.2f}')
-    print(f'To sell {qty} BTC: ${bid_price:,.2f}')
+    # print(f'To buy {qty} BTC: ${ask_price:,.2f}')
+    print(f'To buy {qty} ETH: ${ask_price:,.2f}')
+    print(f'Buy coverage by provider: Coinbase {ask_cb_percent}  Gemini {100-ask_cb_percent}')
+    # print(f'To sell {qty} BTC: ${bid_price:,.2f}')
+    print(f'To sell {qty} ETH: ${bid_price:,.2f}')
+    print(f'Sell coverage by provider: Coinbase {bid_cb_percent}  Gemini {100-bid_cb_percent}')
     return 0
 
 

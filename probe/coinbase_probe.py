@@ -15,7 +15,7 @@ COINBASE_URL = 'https://api.exchange.coinbase.com/products/BTC-USD/book?level=2'
 # Use this in the Python Console to get the results:
 #   bid_df, ask_df = asyncio.run(probe())
 
-async def probe() -> (pd.DataFrame, pd.DataFrame):
+async def probe_cb() -> (pd.DataFrame, pd.DataFrame):
     """Returns bids and asks as DataFrame for analysis"""
 
     async with aiohttp.ClientSession() as session:
